@@ -1,0 +1,6 @@
+# pycharm ignores
+
+.idea/
+
+# python ignores
+*.pyc
