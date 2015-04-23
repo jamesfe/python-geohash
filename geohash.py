@@ -1,10 +1,10 @@
-# coding: UTF-8
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals, absolute_import, division, print_function
 """
 Copyright (C) 2009 Hiroaki Kawai <kawai@iij.ad.jp>
 """
+
+from __future__ import unicode_literals, absolute_import, division, print_function
+
 try:
     import _geohash
 except ImportError:
@@ -33,15 +33,15 @@ def _float_hex_to_int(f):
 
     h = f.hex()
     x = h.find("0x1.")
-    assert(x >= 0)
+    assert x >= 0
     p = h.find("p")
-    assert(p > 0)
+    assert p > 0
 
     half_len = len(h[x + 4:p])*4 - int(h[p + 1:])
-    if x==0:
-        r = (1 << half_len) + ((1 << (len(h[x + 4:p])*4)) + int(h[x + 4:p], 16))
+    if x == 0:
+        r = (1 << half_len) + ((1 << (len(h[x + 4:p]) * 4)) + int(h[x + 4:p], 16))
     else:
-        r = (1 << half_len) - ((1 << (len(h[x + 4:p])*4)) + int(h[x + 4:p], 16))
+        r = (1 << half_len) - ((1 << (len(h[x + 4:p]) * 4)) + int(h[x + 4:p], 16))
 
     return r, half_len + 1
 
@@ -61,7 +61,7 @@ def _int_to_float_hex(i, l):
 
 
 def _encode_i2c(lat, lon, lat_length, lon_length):
-    precision = int((lat_length+lon_length)/5)
+    precision = int((lat_length + lon_length) / 5)
     if lat_length < lon_length:
         a = lon
         b = lat
@@ -72,7 +72,7 @@ def _encode_i2c(lat, lon, lat_length, lon_length):
     boost = (0, 1, 4, 5, 16, 17, 20, 21)
     ret = ''
     for i in range(precision):
-        ret+=_base32[(boost[a&7]+(boost[b&3] << 1))&0x1F]
+        ret += _base32[(boost[a & 7] + (boost[b & 3] << 1)) & 0x1F]
         t = a >> 3
         a = b >> 2
         b = t
@@ -100,8 +100,8 @@ def encode(latitude, longitude, precision=12):
         lon_length += 1
 
     if hasattr(float, "fromhex"):
-        a = _float_hex_to_int(latitude/90.0)
-        o = _float_hex_to_int(longitude/180.0)
+        a = _float_hex_to_int(latitude / 90.0)
+        o = _float_hex_to_int(longitude / 180.0)
         if a[1] > lat_length:
             ai = a[0] >> (a[1] - lat_length)
         else:
@@ -125,7 +125,7 @@ def encode(latitude, longitude, precision=12):
     if lon > 0:
         lon = int((1 << lon_length) * lon) + (1 << (lon_length - 1))
     else:
-        lon = (1 << lon_length - 1) - int((1 << lon_length)*(-lon))
+        lon = (1 << lon_length - 1) - int((1 << lon_length) * (-lon))
 
     return _encode_i2c(lat, lon, lat_length, lon_length)[:precision]
 
@@ -223,7 +223,7 @@ def bbox(hashcode):
         (lat, lon, lat_bits, lon_bits) = _geohash.decode(hashcode)
         latitude_delta = 180.0 / (1 << lat_bits)
         longitude_delta = 360.0 / (1 << lon_bits)
-        return {'s':lat, 'w':lon, 'n':lat + latitude_delta, 'e':lon + longitude_delta}
+        return {'s': lat, 'w': lon, 'n': lat + latitude_delta, 'e': lon + longitude_delta}
 
     (lat, lon, lat_length, lon_length) = _decode_c2i(hashcode)
     if hasattr(float, "fromhex"):
@@ -237,14 +237,14 @@ def bbox(hashcode):
     if lat_length:
         ret['n'] = 180.0 * (lat + 1 - (1 << (lat_length - 1))) / (1 << lat_length)
         ret['s'] = 180.0 * (lat - (1 << (lat_length - 1))) / (1 << lat_length)
-    else: # can't calculate the half with bit shifts (negative shift)
+    else:  # can't calculate the half with bit shifts (negative shift)
         ret['n'] = 90.0
         ret['s'] = -90.0
 
     if lon_length:
-        ret['e'] = 360.0*(lon + 1 - (1 << (lon_length - 1))) / (1 << lon_length)
-        ret['w'] = 360.0*(lon - (1 << (lon_length - 1))) / (1 << lon_length)
-    else: # can't calculate the half with bit shifts (negative shift)
+        ret['e'] = 360.0 * (lon + 1 - (1 << (lon_length - 1))) / (1 << lon_length)
+        ret['w'] = 360.0 * (lon - (1 << (lon_length - 1))) / (1 << lon_length)
+    else:  # can't calculate the half with bit shifts (negative shift)
         ret['e'] = 180.0
         ret['w'] = -180.0
 
@@ -252,7 +252,7 @@ def bbox(hashcode):
 
 
 def neighbors(hashcode):
-    if _geohash and len(hashcode)<25:
+    if _geohash and len(hashcode) < 25:
         return _geohash.neighbors(hashcode)
 
     (lat, lon, lat_length, lon_length) = _decode_c2i(hashcode)
@@ -286,7 +286,7 @@ def _uint64_interleave(lat32, lon32):
     intr = 0
     boost = (0, 1, 4, 5, 16, 17, 20, 21, 64, 65, 68, 69, 80, 81, 84, 85)
     for i in range(8):
-        intr = (intr<<8) + (boost[(lon32>>(28 - i*4))%16] << 1) + boost[(lat32>>(28 - i*4))%16]
+        intr = (intr << 8) + (boost[(lon32 >> (28 - i * 4)) % 16] << 1) + boost[(lat32 >> (28 - i * 4)) % 16]
 
     return intr
 
@@ -294,7 +294,7 @@ def _uint64_interleave(lat32, lon32):
 def _uint64_deinterleave(ui64):
     lat = lon = 0
     boost = ((0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3),
-             (2, 0), (2, 1), (3, 0), (3, 1), (2 , 2), (2, 3), (3, 2), (3, 3))
+             (2, 0), (2, 1), (3, 0), (3, 1), (2, 2), (2, 3), (3, 2), (3, 3))
     for i in range(16):
         p = boost[(ui64 >> (60 - i * 4)) % 16]
         lon = (lon << 2) + p[0]
@@ -316,12 +316,12 @@ def encode_uint64(latitude, longitude):
         if _geohash.intunit == 64:
             return ui128[0]
         elif _geohash.intunit == 32:
-            return (ui128[0]<<32) + ui128[1]
+            return (ui128[0] << 32) + ui128[1]
         elif _geohash.intunit == 16:
-            return (ui128[0]<<48) + (ui128[1]<<32) + (ui128[2] << 16) + ui128[3]
+            return (ui128[0] << 48) + (ui128[1] << 32) + (ui128[2] << 16) + ui128[3]
 
-    lat = int(((latitude + 90.0)/180.0)*(1 << 32))
-    lon = int(((longitude + 180.0)/360.0)*(1 << 32))
+    lat = int(((latitude + 90.0) / 180.0) * (1 << 32))
+    lon = int(((longitude + 180.0) / 360.0) * (1 << 32))
     return _uint64_interleave(lat, lon)
 
 
@@ -332,7 +332,7 @@ def decode_uint64(ui64):
             return latlon
 
     lat, lon = _uint64_deinterleave(ui64)
-    return (180.0*lat / (1 << 32) - 90.0, 360.0*lon / (1 << 32) - 180.0)
+    return 180.0 * lat / (1 << 32) - 90.0, 360.0 * lon / (1 << 32) - 180.0
 
 
 def expand_uint64(ui64, precision=50):
@@ -341,7 +341,7 @@ def expand_uint64(ui64, precision=50):
     lat_grid = 1 << (32 - int(precision/2))
     lon_grid = lat_grid>>(precision % 2)
 
-    if precision<=2: # expand becomes to the whole range
+    if precision <= 2: # expand becomes to the whole range
         return []
 
     ranges = []

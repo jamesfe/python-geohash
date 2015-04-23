@@ -136,7 +136,7 @@ def encodeBase(lat, lon):
     return encodeLv3(lat, lon)
 
 
-def encodeHalf(lat,lon):
+def encodeHalf(lat, lon):
     return encode(lat, lon, 160)
 
 
@@ -144,7 +144,7 @@ def encodeQuarter(lat, lon):
     return encode(lat, lon, 320)
 
 
-def encodeEighth(lat,lon):
+def encodeEighth(lat, lon):
     return encode(lat, lon, 640)
 
 
